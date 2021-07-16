@@ -1,0 +1,54 @@
+# Propriedades
+#   name: nome do schedule
+#   description: (opcional) descrição do schedule
+#   cron: schedule em formato cron
+#   pubsub: dados do pubsub
+#     topic: nome do topico do pubsub alvo
+#     attributes: (opcional) dicionario dos valores dos atributos
+#   http:
+#     method: metodo a ser usado
+#     url: url de destino (pode ser um cloudfunction)
+#     serviceAccountEmail: (opcional) Email da conta de serviço a ser usado como autenticação
+#   payload: (opcional) dados enviados para o pubsub ou http request. Encodado em base 64.
+#   region: (opcional) a região onde o schedule vai ser criado
+#   labels: (opcional) labels do schedule
+
+resources:
+  - name: sch-{{ properties['name'] }}
+    type: gcp-types/cloudscheduler-v1:projects.locations.jobs
+    properties:
+      {% if 'labels' in properties %}
+      labels: {{ properties['labels'] }}
+      {%endif%}
+      parent: projects/{{ env['project'] }}/locations/{{ properties['region'] or 'us-central1' }}
+      {% if 'description' in properties %}
+      description: {{ properties['description'] }}
+      {% endif %}
+      schedule: "{{ properties['cron'] }}"
+      timeZone: America/Sao_Paulo
+      {% if 'http' in properties %}
+      http_target:
+        http_method: {{ properties['http']['method'] }}
+        uri: {{ properties['http']['url'] }}
+        {% if 'payload' in properties %}
+        body: {{ properties['payload'] }}
+        {% endif %}
+        {% if 'serviceAccountEmail' in properties['http'] %}
+        oidcToken:
+          serviceAccountEmail: {{ properties['http']['serviceAccountEmail'] }}
+        {% endif %}
+      {% endif %}
+      {% if 'pubsub' in properties %}
+      pubsubTarget:
+        topicName: projects/{{ env['project'] }}/topics/{{ properties['pubsub']['topic'] }}
+        {% if 'payload' in properties %}
+        data: {{ properties['payload'] }}
+        {% endif %}
+        {% if 'attributes' in properties['pubsub'] %}
+        attributes: {{ properties['pubsub']['attributes'] }}
+        {% endif %}
+      {% endif %}
+
+outputs:
+  - name: 'name'
+    value: {{ properties['name'] }}
