@@ -1,0 +1,66 @@
+# Propriedades
+#   name: Nome da tabela
+#   dataset: Nome do dataset da tabela
+#   description: Descrição da tabela
+#   schema: (obrigatório para tabelas nativas, opcional para externas) Campos da tabela
+#   partition: (opcional) Particionamento da tabela
+#     mode: (opcional, padrão TIME) tipo de particionamento da tabela, entre TIME e RANGE
+#     field: campo da tabela por onde se particiona
+#     type: tipo de particionamento por tempo (DAY, HOUR, MONTH, ou YEAR)
+#     expirationMs: tempo para manter a partição (em milisecundos) para particionamento por tempo
+#     range: para partições de range
+#       start: início do range
+#       end: final do range
+#       interval: tamanho das partições
+#   external: Controla as tabelas externas
+#     bucket: Bucket onde o registro vai estar
+#     format: Formato do arquivo
+#     hivePartition: (opcional) Se a tabela externa estiver particionada como uma estrutura de partição por subdiretorio
+#       mode: (opcional, padrão AUTO) O tipo de avaliação de tipo das partições (entre AUTO, STRING ou CUSTOM)
+#       source: A forma do caminho para a raiz da tabela, para AUTO ou STRING. Com as formatação dos tipos de particao para o CUSTOM
+#   labels: (opcional) Labels da tabela
+
+resources:
+  - name: bqt-{{ properties['name'] }}
+    type: bigquery.v2.table
+    properties:
+      {% if 'labels' in properties %}
+      labels: {{ properties['labels'] }}
+      {%endif%}
+      datasetId: {{ properties['dataset'] }}
+      tableReference:
+        projectId: {{ env['project'] }}
+        tableId: {{ properties['name'] }}
+      description: {{ properties['description'] }}
+      {% if properties[ 'schema'] %}
+      schema:
+        fields: {{ properties['schema'] }}
+      {% endif %}
+      {% if 'partition' in properties and properties['partition'].get('mode', 'time').lower() == 'time' %}
+      timePartitioning:
+        type: {{ properties['partition']['type'].upper() }}
+        field: {{ properties['partition']['field'] }}
+        {% if 'expirationMs' in properties['partition'] %}
+        expirationMs: {{ properties['partition']['expirationMs'] }}
+        {% endif %}
+      {% endif %}
+      {% if 'partition' in properties and properties['partition'].get('mode', '').lower() == 'range' %}
+      rangePartitioning:
+        field: {{ properties['partition']['field'] }}
+        range: {{ properties['partition']['range'] }}
+      {% endif %}
+      {% if 'external' in properties %}
+      externalDataConfiguration:
+        sourceUris:
+          - gs://{{ properties['external']['bucket'] }}
+        sourceFormat: {{ properties['external']['format'] }}
+        {% if properties['external']['hivePartition'] %}
+        hivePartitioningOptions:
+          mode: {{ properties['external']['hivePartition']['mode'] or 'AUTO' }}
+          sourceUriPrefix: gs://{{ properties['external']['hivePartition']['source'] }}
+        {% endif%}
+      {% endif %}
+
+outputs:
+  - name: name
+    value: {{ properties['name'] }}

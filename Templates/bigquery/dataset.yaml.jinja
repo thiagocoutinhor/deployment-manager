@@ -1,0 +1,21 @@
+# Propriedades
+#   name: Nome do dataset
+#   description: Descrição do dataset
+
+resources:
+  - name: bqd-{{ properties['name'] }}
+    type: bigquery.v2.dataset
+    properties:
+      {% if 'labels' in properties %}
+      labels: {{ properties['labels'] }}
+      {%endif%}
+      datasetReference:
+        projectId: {{ env['project'] }}
+        datasetId: {{ properties['name'] }}
+      {% if 'description' in properties %}
+      description: {{ properties['description'] }}
+      {% endif %}
+
+outputs:
+  - name: name
+    value: $(ref.bqd-{{ properties['name'] }}.datasetReference.datasetId)
