@@ -1,0 +1,108 @@
+# Campos do workflow
+#   id: Identificador do workflow
+#   region: (opcional, padrão us-central1) Região do dataproc
+#   timeout: (opcional, padrão 1 hora) Tempo, em segundos, para o timeout de execução
+#   cluster: Informações do cluster a ser criado
+#     name: Nome do cluster
+#     bucket: Bucket para uso do cluster
+#     image: (opcional, padrão 1.4-debian10) Imagem do SO do cluster
+#     serviceAccount: Email da conta de serviço que executará o processo
+#     network: (opcional) Configurações de rede
+#     subnetwork: (opcional) Configurações da subrede
+#     properties: (opcional) Propriedades aplicadas a todo o cluster (todos os jobs são atefados)
+#     webInterfaces: (opcional, padrão true) Se o cluster permite acesso as interfaces dos componentes
+#     master: (opcional) Informações sobre o master
+#       num: (opcional, padrão 1) Número de masters a serem usados
+#       machine: (opcional, padrão n1-standard-2) O tipo de máquina a ser usado
+#     workers: (opcional) Informações sobre os workers
+#       num: (opcional, padrão 2) Número de workers a serem usados
+#       machine: (opcional, padrão n1-standard-2) O tipo de máquina a ser usado
+#     initialization: (opcional) Script de inicialização do cluster
+#       executableFile: Caminho para o arquivo a ser executado
+#       timeout: (opcional, padrão 120 segundos) Tempo de timeout da execução
+#   pysparkJobs: Lista com os jobs pyspark a serem executados no cluster
+#     id: A identificação do job
+#     mainPy: O caminho para o python principal a ser executado
+#     pyFiles: (opcional) Lista do caminho para arquivos python a serem usados
+#     prerequisites: (opcional) Lista de job id que são prerequisitos para a execução desse job
+#     args: (opcional) Lista de argumentos que o job espera
+#     properties: (opcional) Lista de propriedades do job
+#   parameters: (opcional) Lista de parâmetros que esse workflow recebe
+#   labels: Lista de labels do GCP para esse workflow
+
+resources:
+  - name: dtp-{{ properties['id'] }}
+    type: gcp-types/dataproc-v1:projects.regions.workflowTemplates
+    properties:
+      parent: projects/{{ env['project'] }}/regions/{{ properties['region'] or 'us-central1' }}
+      {% if 'labels' in properties %}
+      labels: {{ properties['labels'] }}
+      {%endif%}
+      id: {{ properties['id'] }}
+      name: projects/{{ env['project'] }}/regions/{{ properties['region'] or 'us-central1' }}/workflowTemplates/{{ properties['id'] }}
+      dagTimeout: {{ properties['timeout'] or '3600s' }}
+      placement:
+        managedCluster:
+          clusterName: {{ properties['cluster']['name'] }}
+          config:
+            configBucket: {{ properties['cluster']['bucket'] }}
+            softwareConfig:
+              imageVersion: {{ properties['cluster']['image'] or '1.4-debian10'}}
+              {% if properties['cluster']['properties'] %}
+              properties: {{ properties['cluster']['properties'] }}
+              {% endif %}
+            {% if 'initialization' in properties['cluster']%}
+            endpointConfig:
+              enableHttpPortAccess: {{ properties['cluster']['webInterfaces'] or 'true' }}
+            initializationActions:
+              - executableFile: {{ properties['cluster']['initialization']['executableFile']}}
+                executionTimeout: {{ properties['cluster']['initialization']['timeout'] or '120s'}}
+            {% endif %}
+            gceClusterConfig:
+              serviceAccount: {{ properties['cluster']['serviceAccount'] }}
+              serviceAccountScopes:
+                - https://www.googleapis.com/auth/cloud-platform
+              {% if properties['cluster']['network'] %}
+              networkUri: {{ properties['cluster']['network'] }}
+              {% endif %}
+              {% if properties['cluster']['subnetwork'] %}
+              subnetworkUri: {{ properties['cluster']['subnetwork'] }}
+              {% endif %}
+            masterConfig:
+              numInstances: {{ properties['cluster']['master']['num'] or 1 }}
+              machineTypeUri: {{ properties['cluster']['master']['machine'] or 'n1-standard-2'}}
+            workerConfig:
+              numInstances: {{ properties['cluster']['workers']['num'] or 2 }}
+              machineTypeUri: {{ properties['cluster']['workers']['machine'] or 'n1-standard-2' }}
+
+      jobs:
+        {% for job in properties['pysparkJobs'] %}
+        - stepId: {{ job['id'] }}
+          {% if 'prerequisites' in job %}
+          prerequisiteStepIds: {{ job['prerequisites'] }}
+          {% endif %}
+          pysparkJob:
+            mainPythonFileUri: {{ job['mainPy'] }}
+            {% if 'pyFiles' in job %}
+            pythonFileUris: {{ job['pyFiles'] }}
+            {% endif %}
+            properties:
+              spark.hadoop.fs.gs.requester.pays.mode: ENABLED
+              spark.sql.sources.partitionOverwriteMode: dynamic
+              {% if job['properties'] %}
+              {% for property, value in job['properties'].items() %}
+              {{ property }}: '{{ value }}'
+              {% endfor %}
+              {% endif %}
+            {% if 'args' in job %}
+            args: {{ job['args'] }}
+            {% endif %}
+        {% endfor %}
+
+      {% if 'parameters' in properties %}
+      parameters: {{ properties['parameters'] }}
+      {% endif %}
+
+outputs:
+  - name: id
+    value: {{ properties['id'] }}
