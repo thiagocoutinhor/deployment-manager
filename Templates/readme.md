@@ -33,6 +33,6 @@ Veja a documentação de cada template para saber quais propriedades são extern
 
 # Referências
 
-- Documentação do deployment manager sobre templates
+- [Documentação do deployment manager sobre templates](https://cloud.google.com/deployment-manager/docs/configuration/templates/create-basic-template)
 
-- Documentação oficial do Jinja
+- [Documentação oficial do Jinja](https://jinja.palletsprojects.com/en/2.11.x/)
