@@ -1,0 +1,63 @@
+# Propriedades
+#   name: Nome da cloud-function
+#   serviceAccountEmail: Email da conta de serviço que vai rodar a funcao
+#   source: Dados do repositorio da fonte
+#     repository: Nome do repositório do código fonte
+#     branch: Nome do branch do codigo fonte (branch, tag ou revision devem estar preenchidos)
+#     tag: Nome da tag do ocódigo (branch, tag ou revision devem estar preenchidos)
+#     revision: Código da revisão (branch, tag ou revision devem estar preenchidos)
+#     path: Diretório do código fonte
+#   entryPoint: Nome da função a ser executada no código
+#   trigger: Trigger de evento da função
+#     url: Para triggers por URL, use esse atributo como true
+#   variables: Variávei de ambiente usada na função
+#   memory: (opcional, padrão 128) Quantidade de memória disponível apra a função
+#   runtime: (opcional, padrão python37) Qual a linguagem que a função usa
+#   timeout: (opcional, padrão 60) O timeout da função, em segundos
+#   region: (opcional, padrão us-central1) A região da função
+#   labels: (opcional) Labels da função
+
+{% set regiao = properties['region'] or 'us-central1' %}
+
+resources:
+  - name: clf-{{ properties['name'] }}
+    type: gcp-types/cloudfunctions-v1:projects.locations.functions
+    properties:
+      {% if 'labels' in properties %}
+      labels: {{ properties['labels'] }}
+      {%endif%}
+      parent: projects/{{ env['project'] }}/locations/{{ regiao }}
+      function: {{ properties['name'] }}
+      serviceAccountEmail: {{ properties['serviceAccountEmail'] }}
+      runtime: {{ properties['runtime'] or 'python37' }}
+      timeout: {{ properties['timeout'] or '60s' }}
+      sourceRepository:
+        {% set baseUrl = 'https://source.developers.google.com/projects/' + env['project'] + '/repos/' + properties['source']['repository'] %}
+        {% set path = '/paths/' + properties['source']['path'] if 'path' in properties['source'] else '' %}
+        {% if 'revision' in properties['source']%}
+        url: {{baseUrl}}/revisions/{{ properties['source']['revision'] }}{{path}}
+        {% endif %}
+        {% if 'tag' in properties['source']%}
+        url: {{baseUrl}}/fixed-aliases/{{ properties['source']['tag'] }}{{path}}
+        {% endif %}
+        {% if 'branch' in properties['source'] %}
+        url: {{baseUrl}}/moveable-aliases/{{ properties['source']['branch'] }}{{path}}
+        {% endif %}
+      entryPoint: {{ properties['entryPoint'] }}
+      availableMemoryMb: {{ properties['memory'] or 128 }}
+      {% if not 'url' in properties['trigger']%}
+      eventTrigger: {{ properties['trigger'] }}
+      {% endif %}
+      {% if 'url' in properties['trigger'] and properties['trigger']['url']%}
+      httpsTrigger:
+        url: https://{{ regiao }}-{{ env['project'] }}.cloudfunctions.net/{{ properties['name'] }}
+      {% endif %}
+      {% if 'variables' in properties %}
+      environmentVariables: {{ properties['variables'] }}
+      {% endif %}
+
+outputs:
+  - name: name
+    value: {{ properties['name'] }}
+  - name: url
+    value: https://{{ regiao }}-{{ env['project'] }}.cloudfunctions.net/{{ properties['name'] }}
