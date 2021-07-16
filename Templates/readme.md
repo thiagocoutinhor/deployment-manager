@@ -27,7 +27,7 @@ Note que as propriedades que você deve informar para esse template são definid
 
 # Outputs
 
-A maioria dos templates tem alguma informação que pode ser referenciada por outros recursos (ver [Dependências e Referências](../reame.md)). Nesse caso elas são declaradas diretamente no template, permitindo que outros recursos as referenciem.
+A maioria dos templates tem alguma informação que pode ser referenciada por outros recursos (ver [Dependências e Referências](../readme.md)). Nesse caso elas são declaradas diretamente no template, permitindo que outros recursos as referenciem.
 
 Veja a documentação de cada template para saber quais propriedades são externadas por outputs.
 
