@@ -4,7 +4,7 @@ O deployment manager permite que os templates sejam feitos tanto em Jinja quanto
 
 # Como usar um template
 
-Se os arquivos de template estiverem em outro diretório que não o do YAML de configuração, informe o diretório relativo para a importação.
+> Se os arquivos de template estiverem em outro diretório que não o do YAML de configuração, informe o diretório relativo durante o preenchimento do `import`.
 
 Um template é um arquivo de configuração que termina com .jinja e que deve ser importado no YAML de configurações do projeto antes de ser usado.
 
