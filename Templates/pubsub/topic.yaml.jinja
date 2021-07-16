@@ -1,0 +1,18 @@
+# Properties
+#   name: Nome do topico do pubsub
+#   labels: (opcional) Labels do tópico
+
+resources:
+  - name: psb-{{ properties['name'] }}
+    type: pubsub.v1.topic
+    properties:
+      {% if 'labels' in properties %}
+      labels: {{ properties['labels'] }}
+      {%endif%}
+      topic: {{ properties['name'] }}
+
+outputs:
+  - name: name
+    value: {{ properties['name'] }}
+  - name: fullName
+    value: projects/{{ env['project'] }}/topics/{{ properties['name'] }}
