@@ -1,0 +1,20 @@
+# Propriedades:
+#   name: nome da fila
+#   labels: labels da fila
+
+{{ set regiao = properties['region'] or 'us-central1' }}
+
+resources:
+  - name: tqq-{{ properties['name'] }}
+    type: {{ env['project'] }}/cloudtasks:projects.locations.queues
+    properties:
+      {% if 'labels' in properties %}
+      labels: {{ properties['labels'] }}
+      {%endif%}
+      name: projects/{{ env['project'] }}/locations/{{ regiao }}/queues/{{ properties['name'] }}
+      parent: projects/{{ env['project'] }}/locations/{{ regiao }}
+
+
+outputs:
+  - name: name
+    value: {{ properties['name'] }}
