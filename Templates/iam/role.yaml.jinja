@@ -1,0 +1,11 @@
+# Properties
+#   role: Papel a ser adicionado a conta
+#   account: Conta cujo papel será adicionado
+
+resources:
+  - name: role-{{ properties['role'].replace('roles/', '').replace('.', '-') }}-{{ properties['account'].replace(':', '-').replace('@', '').replace('.', '-') }}
+    type: gcp-types/cloudresourcemanager-v1:virtual.projects.iamMemberBinding
+    properties:
+      resource: {{ env['project'] }}
+      role: {{ properties['role'] }}
+      member: {{ properties['account'] }}
