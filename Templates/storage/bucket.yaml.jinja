@@ -1,0 +1,18 @@
+# Propriedades
+#   name: Nome do bucket
+#   region: (opcional) Região do bucket
+#   labels: (opcional) Labels do bucket
+
+resources:
+  - name: {{ properties['name'] }}
+    type: storage.v1.bucket
+    properties:
+      {% if 'labels' in properties %}
+      labels: {{ properties['labels'] }}
+      {%endif%}
+      project: {{ env['project'] }}
+      location: {{ properties['region'] or 'us-central1' }}
+
+outputs:
+  - name: name
+    value: {{ properties['name'] }}
