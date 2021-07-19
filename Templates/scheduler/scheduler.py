@@ -2,7 +2,7 @@ from base64 import b64encode
 
 def generate_config(context):
     resource = {
-        'name': f"sch-{context.properties['name']}",
+        'name': context.properties['name'],
         'type': 'gcp-types/cloudscheduler-v1:projects.locations.jobs',
         'properties': {
             'parent': f"projects/{ context.env['project'] }/locations/{ context.properties.get('region', 'us-central1') }",

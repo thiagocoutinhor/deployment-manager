@@ -14,7 +14,7 @@
 #   labels: (opcional) labels do schedule
 
 resources:
-  - name: sch-{{ properties['name'] }}
+  - name: {{ properties['name'] }}
     type: gcp-types/cloudscheduler-v1:projects.locations.jobs
     properties:
       {% if 'labels' in properties %}
