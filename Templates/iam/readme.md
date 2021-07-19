@@ -1,6 +1,6 @@
 > Para o uso correto desses templates é necessário a adição da role `Security Admin` na conta de serviço `[número do projeto]@cloudservices.gserviceaccount.com`
 
-# Role
+# Add Role
 
 ## Propriedades
 
