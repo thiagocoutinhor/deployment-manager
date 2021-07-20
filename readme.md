@@ -120,13 +120,8 @@ gcloud deployment-manager deployments delete deploy-abandonado --delete-policy=a
 # Referências
 
 - [Saiba mais sobre YAML](https://en.wikipedia.org/wiki/YAML#:~:text=YAML%20a%20recursive%20acronym%20for,is%20being%20stored%20or%20transmitted.)
-
 - [Página oficial do Deployment Manager](https://cloud.google.com/deployment-manager)
-
 - [Página de tutoriais do Deployment Manager](https://cloud.google.com/deployment-manager/docs/quickstart)
-
 - [Tipos de recursos suportados](https://cloud.google.com/deployment-manager/docs/configuration/supported-resource-types)
-
 - [Tipos de recursos por gcp-types](https://cloud.google.com/deployment-manager/docs/configuration/supported-gcp-types)
-
 - [Interface web do deployment manager no projeto](https://console.cloud.google.com/dm/deployments)
