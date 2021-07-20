@@ -5,29 +5,17 @@
 > Pelo menos um dentre `pubsub` ou `http` devem estar preenchidos
 
 - `name` Nome do schedule
-
 - `description` (opcional) Descrição do schedule
-
 - `cron` Agendamento no formato cron
-
 - `pubsub` Caso o alvo do schedule seja um pubsub
-
 - `topic` Tópico alvo no pubsub
-
 - `attributes` (opcional) Dicionário dos valores dos atributos
-
 - `http` Caso o alvo seja uma API (cloud functions são ativadas usando essa opção)
-
 - `method` Método HTTP a ser usado (POST, PUT, DELETE, etc.)
-
 - `url` Url a ser chamado
-
 - `serviceAccountEmail` (opcional) Email da conta de serviço a ser usado como autenticação
-
 - `payload` (opcional) Payload a ser enviado ao alvo. Deve estar encodado em base64
-
 - `region` (opcional) A região onde o schedule vai ser executado (padrão us-central1)
-
 - `labels` (opcional) Labels do schedule
 
 > Para ativar uma cloudfunction através de um shcedule, use a opção `http`
