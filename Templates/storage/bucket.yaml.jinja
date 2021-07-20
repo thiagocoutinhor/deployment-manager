@@ -2,6 +2,9 @@
 #   name: Nome do bucket
 #   region: (opcional) Região do bucket
 #   labels: (opcional) Labels do bucket
+#   policies: (opcional) Lista de acessos específicos ao bucket
+#     - role: Papel a ser adicionado
+#       member: Membro a receber o acesso
 
 resources:
   - name: {{ properties['name'] }}
@@ -12,6 +15,15 @@ resources:
       {%endif%}
       project: {{ env['project'] }}
       location: {{ properties['region'] or 'us-central1' }}
+
+  {% for policy in properties['policies'] %}
+  - name: bkt-role-{{ policy['role'].replace('roles/', '').replace('.', '-') }}-{{ policy['member'].replace(':', '-').replace('@', '').replace('.', '-') }}
+    type: gcp-types/storage-v1:virtual.buckets.iamMemberBinding
+    properties:
+      bucket: {{ properties['name'] }}
+      role: {{ policy['role'] }}
+      member: {{ policy['member'] }}
+  {% endfor %}
 
 outputs:
   - name: name
