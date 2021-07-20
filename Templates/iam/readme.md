@@ -5,7 +5,6 @@
 ## Propriedades
 
 - `role` Papel a ser atribuído a conta
-
 - `account` Conta a qual o papel vai ser atribuído
 
 > A propriedade `account` precisa de um prefixo referente ao tipo de conta. Para as contas de serviço, use `serviceAccount:[EMAIL]` e `user:[EMAIL]`, para os usuários.
@@ -15,11 +14,8 @@
 ## Propriedades
 
 - `name` Nome da conta de serviço
-
 - `displayName` (opcional) Nome de exibição da conta
-
 - `roles` Lista de papeis da conta
-
 - `labels` (opcional) Labels da conta de serviço
 
 > Consulte a lista completa de papeis disponíveis no seu projeto. Ao clicar em qualquer um dos papeis para mais detalhes basta copiar o ID do papel informado na tela e acrescentá-lo na lista.
@@ -27,5 +23,19 @@
 ## Outputs
 
 - `name` Nome recebido na propriedade
-
 - `email` E-mail gerado da conta de serviço
+
+# Custom Role
+
+> A conta de serviço do Deployment Manager precisa de permissão de `Role Administrator` para poder usar esse template.
+
+## Propriedades
+
+- `name` Nome do papel
+- `description` Descrição do papel
+- `permissions` Lista de permissões do papel
+
+## Outputs
+
+- `name` Nome recebido na propriedade
+- `fullName` Nome completo do recurso

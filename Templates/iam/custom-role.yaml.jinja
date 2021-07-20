@@ -1,0 +1,23 @@
+# Propriedades:
+#   name: Nome do papel
+#   description: Descrição do papel
+#   permissions: Lista de permissões do papel
+
+
+resources:
+  - name: rol-{{ properties['name'] }}
+    type: gcp-types/iam-v1:projects.roles
+    properties:
+      parent: projects/{{ env["project"] }}
+      roleId: {{ properties["name"] }}
+      role:
+        title: {{ properties["name"] }}
+        description: {{ properties["description"] }}
+        stage: GA
+        includedPermissions: {{ properties["permissions"] }}
+
+outputs:
+  - name: name
+    value: {{ properties["name"] }}
+  - name: fullName
+    value: projects/{{ env["project"] }}/roles/{{ properties["name"] }}
