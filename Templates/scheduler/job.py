@@ -1,3 +1,18 @@
+# Propriedades
+#   name: nome do schedule
+#   description: (opcional) descrição do schedule
+#   cron: schedule em formato cron
+#   pubsub: dados do pubsub
+#     topic: nome do topico do pubsub alvo
+#     attributes: (opcional) dicionario dos valores dos atributos
+#   http:
+#     method: metodo a ser usado
+#     url: url de destino (pode ser um cloudfunction)
+#     serviceAccountEmail: (opcional) Email da conta de serviço a ser usado como autenticação
+#   payload: (opcional) dados enviados para o pubsub ou http request. Encodado em base 64.
+#   region: (opcional) a região onde o schedule vai ser criado
+#   labels: (opcional) labels do schedule
+
 from base64 import b64encode
 
 def generate_config(context):
