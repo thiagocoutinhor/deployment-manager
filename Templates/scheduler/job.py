@@ -35,7 +35,7 @@ def generate_config(context):
             'uri': context.properties['http']['url']
         }
 
-        if 'serviceAccountEmail' in context.properties['properties']['http']:
+        if 'serviceAccountEmail' in context.properties['http']:
             resource['properties']['http_target']['oidcToken'] = {
                 'serviceAccountEmail': context.properties['http']['serviceAccountEmail']
             }
