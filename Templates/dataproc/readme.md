@@ -18,13 +18,18 @@
   - `master` (opcional) Informações sobre o master
     - `num` (opcional, padrão 1) Número de masters a serem usados
     - `machine` (opcional, padrão n1-standard-2) O tipo de máquina a ser usado
+    - `disk` (opcional) Disco dos masters
+      - `type` (opcional, padrão pd-standard) Tipo do disco
+      - `size` (opcional, padrão 15) Tamanho em gigas do disco
   - `workers` (opcional) Informações sobre os workers
     - `num` (opcional, padrão 2) Número de workers a serem usados
     - `machine` (opcional, padrão n1-standard-2) O tipo de máquina a ser usado
+    - `disk` (opcional) Disco dos workers
+      - `type` (opcional, padrão pd-standard) Tipo do disco
+      - `size` (opcional, padrão 15) Tamanho em gigas do disco
   - `initialization` (opcional) Script de inicialização do cluster
     - `executableFile` Caminho para o arquivo a ser executado
     - `timeout` (opcional, padrão 120 segundos) Tempo de timeout da execução
-
 - `pysparkJobs` Lista com os jobs pyspark a serem executados no cluster
   - `id` A identificação do job
   - `mainPy` O caminho para o python principal a ser executado

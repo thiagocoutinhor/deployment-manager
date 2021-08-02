@@ -1,5 +1,5 @@
-# Campos do workflow
-#   id: Identificador do workflow
+# Campos do template
+#   id: Identificador do template
 #   region: (opcional, padrão us-central1) Região do dataproc
 #   timeout: (opcional, padrão 1 hora) Tempo, em segundos, para o timeout de execução
 #   cluster: Informações do cluster a ser criado
@@ -14,9 +14,15 @@
 #     master: (opcional) Informações sobre o master
 #       num: (opcional, padrão 1) Número de masters a serem usados
 #       machine: (opcional, padrão n1-standard-2) O tipo de máquina a ser usado
+#       disk: (opcional) Disco dos masters
+#         type: (opcional, padrão pd-standard) Tipo do disco
+#         size: (opcional, padrão 15) Tamanho em gigas do disco
 #     workers: (opcional) Informações sobre os workers
 #       num: (opcional, padrão 2) Número de workers a serem usados
 #       machine: (opcional, padrão n1-standard-2) O tipo de máquina a ser usado
+#       disk: (opcional) Disco dos workers
+#         type: (opcional, padrão pd-standard) Tipo do disco
+#         size: (opcional, padrão 15) Tamanho em gigas do disco
 #     initialization: (opcional) Script de inicialização do cluster
 #       executableFile: Caminho para o arquivo a ser executado
 #       timeout: (opcional, padrão 120 segundos) Tempo de timeout da execução
@@ -28,7 +34,7 @@
 #     args: (opcional) Lista de argumentos que o job espera
 #     properties: (opcional) Lista de propriedades do job
 #   parameters: (opcional) Lista de parâmetros que esse workflow recebe
-#   labels: Lista de labels do GCP para esse workflow
+#   labels: Lista de labels do GCP para esse template
 
 resources:
   - name: dtp-{{ properties['id'] }}
@@ -71,9 +77,15 @@ resources:
             masterConfig:
               numInstances: {{ properties['cluster']['master']['num'] or 1 }}
               machineTypeUri: {{ properties['cluster']['master']['machine'] or 'n1-standard-2'}}
+              diskConfig:
+                bootDiskType: {{ properties['cluster']['master']['disk']['type'] or 'pd-standard' if 'disk' in properties['cluster']['master'] else 'pd-standard' }}
+                bootDiskSizeGb: {{ properties['cluster']['master']['disk']['size'] or 15 if 'disk' in properties['cluster']['master'] else 15 }}
             workerConfig:
               numInstances: {{ properties['cluster']['workers']['num'] or 2 }}
               machineTypeUri: {{ properties['cluster']['workers']['machine'] or 'n1-standard-2' }}
+              diskConfig:
+                bootDiskType: {{ properties['cluster']['workers']['disk']['type'] or 'pd-standard' if 'disk' in properties['cluster']['workers'] else 'pd-standard' }}
+                bootDiskSizeGb: {{ properties['cluster']['workers']['disk']['size'] or 15 if 'disk' in properties['cluster']['workers'] else 15 }}
 
       jobs:
         {% for job in properties['pysparkJobs'] %}
